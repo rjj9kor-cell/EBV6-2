@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.6);
@@ -159,7 +159,10 @@
                 </div>
                 <div>
                     <span class="font-extrabold text-sm md:text-base tracking-wider text-white">CYBERARENA <span class="text-cyan-400">// ESCAPE LAB</span></span>
-                    <span class="hidden sm:inline-block ml-2 text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">GLOBAL SYNC V4.0</span>
+                    <!-- LIVE CLOUD STATUS INDICATOR -->
+                    <button onclick="openCloudDiagnostics()" id="hud-cloud-status" class="ml-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded font-mono transition-all">
+                        <i class="fa-solid fa-circle-notch fa-spin mr-1"></i> CONNECTING CLOUD...
+                    </button>
                 </div>
             </div>
 
@@ -222,7 +225,9 @@
             </div>
 
             <div class="mt-8 border-t border-slate-800/80 pt-4 flex justify-between items-center text-xs text-slate-500 font-mono">
-                <span><i class="fa-solid fa-network-wired text-cyan-500 mr-1"></i> Multi-Laptop Cloud Sync</span>
+                <button onclick="openCloudDiagnostics()" class="hover:text-cyan-400 transition-colors">
+                    <i class="fa-solid fa-network-wired text-cyan-500 mr-1"></i> Multi-Laptop Cloud Sync
+                </button>
                 <span class="text-rose-400 font-bold">Mistake: -2 XP</span>
             </div>
         </div>
@@ -233,7 +238,7 @@
     <!-- ====================================================================== -->
     <section id="screen-game" class="game-screen min-h-[calc(100vh-60px)] p-4 md:p-8">
         <div class="max-w-5xl mx-auto space-y-6">
-            
+
             <!-- Chamber Progress Bar -->
             <div class="grid grid-cols-5 gap-2" id="chamber-stepper">
                 <div class="ch-step px-2 py-3 rounded-lg text-[10px] font-black uppercase text-center border bg-slate-950/40 border-slate-800 text-slate-500" id="step-1">1. Logic</div>
@@ -245,7 +250,6 @@
 
             <!-- CHAMBER 1: LOGIC CORE -->
             <div id="room-card-1" class="room-deck cyber-card rounded-2xl p-6 md:p-8 border-cyan-500/40 space-y-6 relative overflow-hidden">
-                <!-- SVG Room Thematic Graphic Banner -->
                 <div class="h-28 w-full rounded-xl bg-gradient-to-r from-cyan-950/40 to-slate-950 border border-cyan-500/30 p-4 flex items-center justify-between relative overflow-hidden">
                     <div class="z-10">
                         <span class="bg-cyan-900/60 text-cyan-300 border border-cyan-500/40 px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest">Chamber 01 of 05</span>
@@ -293,7 +297,6 @@
                     </button>
                 </div>
 
-                <!-- Pedagogical Hint Drawer -->
                 <div id="r1-hint-box" class="hidden p-4 rounded-xl bg-slate-950/90 border border-cyan-500/30 text-xs font-mono space-y-2 text-slate-300"></div>
             </div>
 
@@ -312,7 +315,6 @@
                     </svg>
                 </div>
 
-                <!-- 8-Row Scientific Telemetry Table (Clean, Non-Highlighted) -->
                 <div class="overflow-x-auto rounded-xl border border-slate-800">
                     <table class="w-full text-xs text-left border-collapse bg-slate-950/60 font-mono">
                         <thead>
@@ -691,7 +693,7 @@
     <!-- ====================================================================== -->
     <section id="screen-scorecard" class="game-screen min-h-[calc(100vh-60px)] p-4 md:p-8 flex items-center justify-center">
         <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
+
             <!-- Summary Scorecard & Radar -->
             <div class="cyber-card rounded-2xl p-6 md:p-8 border-emerald-500/40 shadow-[0_0_50px_rgba(16,185,129,0.15)] space-y-6">
                 <div class="text-center">
@@ -822,14 +824,64 @@
     </div>
 
     <!-- ====================================================================== -->
-    <!-- 5. ADMIN CONTROL ROOM (OVERLAY MODAL)                                  -->
+    <!-- 5. CLOUD DIAGNOSTICS & SYNC CONFIGURATION DRAWER                      -->
+    <!-- ====================================================================== -->
+    <div id="cloud-diagnostics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="max-w-md w-full cyber-card rounded-2xl p-6 border-cyan-500/50 shadow-[0_0_50px_rgba(6,182,212,0.2)] space-y-4">
+            <h3 class="text-lg font-black text-white flex items-center gap-2 uppercase tracking-wide">
+                <i class="fa-solid fa-network-wired text-cyan-400"></i> Cloud Network Diagnostics
+            </h3>
+            <p class="text-xs text-slate-400 leading-relaxed font-mono">
+                Verify if your laptop can reach the shared cloud bucket across corporate proxies/firewalls.
+            </p>
+
+            <div class="bg-slate-950/90 rounded-xl p-3 border border-slate-800 space-y-2 text-xs font-mono">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400">Active Bucket ID:</span>
+                    <span class="text-cyan-400 font-bold" id="diag-bucket-id">wCNvBqgRyzXMRdW8DtFjp</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400">Connection Status:</span>
+                    <span class="font-bold" id="diag-status-badge">Checking...</span>
+                </div>
+                <div class="flex justify-between items-center text-[11px]">
+                    <span class="text-slate-500">Last HTTP Code:</span>
+                    <span class="text-slate-300 font-bold" id="diag-http-code">---</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] uppercase text-cyan-400 font-black mb-1">Update / Paste New Bucket ID</label>
+                <div class="flex gap-2">
+                    <input type="text" id="manual-bucket-input" placeholder="e.g. wCNvBqgRyzXMRdW8DtFjp" 
+                        class="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-cyan-300 font-mono text-xs focus:outline-none focus:border-cyan-500">
+                    <button onclick="applyNewBucketId()" class="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold uppercase">
+                        Save
+                    </button>
+                </div>
+                <span class="text-[10px] text-slate-500 mt-1 block">* Free serverless key-value bucket via kvdb.io</span>
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t border-slate-800">
+                <button onclick="testCloudConnection()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-bold uppercase">
+                    <i class="fa-solid fa-satellite-dish mr-1"></i> Test Connection
+                </button>
+                <button onclick="closeCloudDiagnostics()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-xs font-bold uppercase">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- 6. ADMIN CONTROL ROOM (BSV6-bgsw)                                     -->
     <!-- ====================================================================== -->
     <div id="admin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
         <div class="max-w-md w-full cyber-card rounded-2xl p-6 border-rose-500/50 shadow-[0_0_50px_rgba(244,63,94,0.15)] space-y-5">
             <h3 class="text-xl font-black text-white flex items-center gap-2 uppercase tracking-wide">
                 <span class="text-rose-500"><i class="fa-solid fa-shield-halved"></i></span> Admin Control Center
             </h3>
-            
+
             <!-- Auth Form -->
             <div id="admin-auth-panel" class="space-y-4">
                 <p class="text-xs text-slate-400">Submit master security passkey to view and manage global participant records:</p>
@@ -865,13 +917,23 @@
     <!-- ====================================================================== -->
     <script>
         // ====================================================================
-        // 1. GLOBAL SYNCHRONIZATION SETTINGS
+        // 1. GLOBAL SYNCHRONIZATION SETTINGS (UPDATED TO USER REAL BUCKET)
         // ====================================================================
-        // Connects all laptops to a shared key-value store.
-        const GLOBAL_KVDB_BUCKET = 'wCNvBqgRyzXMRdW8DtFjp'; // Active competition room ID
-        const CLOUD_SYNC_ENDPOINT = `https://kvdb.io/${GLOBAL_KVDB_BUCKET}/leaderboard_v1`;
+        const DEFAULT_BUCKET = 'wCNvBqgRyzXMRdW8DtFjp';
+        let activeBucket = localStorage.getItem('custom_kvdb_bucket') || DEFAULT_BUCKET;
+        
+        // Auto-migrate from any older dummy test bucket keys
+        if (activeBucket === '8qNmWkZ9K8B2a4R7xY1m9Q' || !activeBucket) {
+            activeBucket = DEFAULT_BUCKET;
+            localStorage.setItem('custom_kvdb_bucket', DEFAULT_BUCKET);
+        }
+
         const LOCAL_STORAGE_BACKUP = 'ai_cyber_arena_local_fallback';
         const MASTER_PIN = 'BSV6-bgsw'; // Secret admin password
+
+        function getCloudEndpoint() {
+            return `https://kvdb.io/${activeBucket}/leaderboard_v1`;
+        }
 
         // Application State
         let state = {
@@ -880,28 +942,52 @@
             mistakeCount: 0,
             penaltyXP: 0,
             currentRoom: 1,
-            attempts: { r1: 0, r2: 0, r3: 0, r4: 0, r5: 0 }
+            attempts: { r1: 0, r2: 0, r3: 0, r4: 0, r5: 0 },
+            isCloudOnline: false
         };
 
         // ====================================================================
         // 2. CLOUD DATABASE ENGINE (SYNC ACROSS ALL LAPTOPS)
         // ====================================================================
+        function updateCloudBadge(online, msg = '') {
+            const badge = document.getElementById('hud-cloud-status');
+            if (online) {
+                state.isCloudOnline = true;
+                badge.className = 'ml-2 text-[10px] bg-emerald-950/60 text-emerald-400 border border-emerald-500/40 px-2.5 py-0.5 rounded font-mono hover:bg-emerald-900/60 transition-all';
+                badge.innerHTML = '<i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1 animate-pulse"></i> CLOUD SYNCED';
+            } else {
+                state.isCloudOnline = false;
+                badge.className = 'ml-2 text-[10px] bg-rose-950/60 text-rose-400 border border-rose-500/40 px-2.5 py-0.5 rounded font-mono hover:bg-rose-900/60 transition-all';
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ${msg || 'LOCAL FALLBACK'}`;
+            }
+        }
+
         async function fetchGlobalStandings() {
+            const endpoint = getCloudEndpoint();
             try {
-                const response = await fetch(CLOUD_SYNC_ENDPOINT, {
+                const response = await fetch(endpoint, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' },
                     cache: 'no-cache'
                 });
+
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data)) {
+                        updateCloudBadge(true);
                         localStorage.setItem(LOCAL_STORAGE_BACKUP, JSON.stringify(data));
                         return data;
                     }
+                } else if (response.status === 404) {
+                    // Bucket exists and is ready for initial record
+                    updateCloudBadge(true);
+                    return [];
+                } else {
+                    updateCloudBadge(false, `HTTP ${response.status}`);
                 }
             } catch (err) {
-                console.warn('Network sync offline or proxy delay. Loading local records.', err);
+                console.warn('Network sync offline or proxy block:', err);
+                updateCloudBadge(false, 'PROXY BLOCKED');
             }
 
             try {
@@ -933,18 +1019,25 @@
             // Sort strictly Highest XP -> Lowest XP
             standings.sort((a, b) => b.xp - a.xp);
 
-            // Save locally
+            // Always write local backup
             localStorage.setItem(LOCAL_STORAGE_BACKUP, JSON.stringify(standings));
 
-            // Broadcast to cloud
+            // Write to Cloud bucket
+            const endpoint = getCloudEndpoint();
             try {
-                await fetch(CLOUD_SYNC_ENDPOINT, {
+                const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(standings)
                 });
+                if (res.ok) {
+                    updateCloudBadge(true);
+                } else {
+                    updateCloudBadge(false, `HTTP ${res.status}`);
+                }
             } catch (syncErr) {
                 console.error('Failed to post score to cloud bucket:', syncErr);
+                updateCloudBadge(false, 'SYNC FAILED');
             }
 
             return standings;
@@ -956,14 +1049,67 @@
         }
 
         // ====================================================================
-        // 3. UI CONTROLLER & MODALS
+        // 3. CLOUD DIAGNOSTICS MODAL
+        // ====================================================================
+        function openCloudDiagnostics() {
+            document.getElementById('cloud-diagnostics-modal').classList.remove('hidden');
+            document.getElementById('diag-bucket-id').textContent = activeBucket;
+            document.getElementById('manual-bucket-input').value = activeBucket;
+            testCloudConnection();
+        }
+
+        function closeCloudDiagnostics() {
+            document.getElementById('cloud-diagnostics-modal').classList.add('hidden');
+        }
+
+        async function testCloudConnection() {
+            const statusBadge = document.getElementById('diag-status-badge');
+            const codeEl = document.getElementById('diag-http-code');
+            statusBadge.className = 'font-bold text-amber-400';
+            statusBadge.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Testing...';
+            codeEl.textContent = '...';
+
+            const endpoint = getCloudEndpoint();
+            try {
+                const res = await fetch(endpoint, { method: 'GET', cache: 'no-cache' });
+                codeEl.textContent = `${res.status} ${res.statusText}`;
+                if (res.ok || res.status === 404) {
+                    statusBadge.className = 'font-bold text-emerald-400';
+                    statusBadge.innerHTML = '🟢 Reachable (CORS OK)';
+                    updateCloudBadge(true);
+                } else {
+                    statusBadge.className = 'font-bold text-rose-400';
+                    statusBadge.innerHTML = `🔴 HTTP Error ${res.status}`;
+                    updateCloudBadge(false, `HTTP ${res.status}`);
+                }
+            } catch (e) {
+                codeEl.textContent = 'Network/CORS Error';
+                statusBadge.className = 'font-bold text-rose-400';
+                statusBadge.innerHTML = '🔴 Blocked by Proxy / Network';
+                updateCloudBadge(false, 'OFFLINE');
+            }
+        }
+
+        function applyNewBucketId() {
+            const val = document.getElementById('manual-bucket-input').value.trim();
+            if (val) {
+                activeBucket = val;
+                localStorage.setItem('custom_kvdb_bucket', val);
+                document.getElementById('diag-bucket-id').textContent = activeBucket;
+                testCloudConnection();
+                showCyberModal('Bucket ID Updated', `Active cloud bucket updated to: <strong>${val}</strong>.<br>All subsequent scores and reads will point here.`);
+            }
+        }
+
+        // ====================================================================
+        // 4. UI CONTROLLER & MODALS
         // ====================================================================
         function showCyberModal(title, message, isSuccess = true) {
             const modal = document.getElementById('cyber-modal');
             const icon = document.getElementById('modal-icon');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').innerHTML = message;
-            
+
             if (isSuccess) {
                 icon.className = 'w-14 h-14 mx-auto rounded-full bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center text-2xl text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]';
                 icon.innerHTML = '<i class="fa-solid fa-check"></i>';
@@ -998,7 +1144,7 @@
         }
 
         // ====================================================================
-        // 4. GAME FLOW & USER REGISTRATION
+        // 5. GAME FLOW & USER REGISTRATION
         // ====================================================================
         async function registerAndStartGame() {
             const handle = document.getElementById('auth-handle-input').value.trim();
@@ -1016,7 +1162,7 @@
 
             state.username = handle.toUpperCase();
             document.getElementById('hud-name').textContent = state.username;
-            
+
             // Clean view transition straight to Room 1
             switchScreen('screen-game');
             setRoom(1);
@@ -1046,7 +1192,7 @@
         }
 
         // ====================================================================
-        // 5. CHAMBER SOLVERS & PEDAGOGICAL HINTS
+        // 6. CHAMBER SOLVERS & PEDAGOGICAL HINTS
         // ====================================================================
 
         // CHAMBER 1: LOGIC CORE
@@ -1078,7 +1224,7 @@
         function solveRoom2() {
             const selected = Array.from(document.querySelectorAll('input[name="r2-box"]:checked')).map(n => n.value);
             const hintBox = document.getElementById('r2-hint-box');
-            
+
             // True physics impossibilities:
             // REC-103: -285.2°C (Below Absolute Zero: -273.15°C is physically impossible)
             // REC-104: 104.8% Humidity (Relative humidity cannot physically exceed 100%)
@@ -1195,7 +1341,7 @@
         }
 
         // ====================================================================
-        // 6. END GAME SCORECARD & GLOBAL LEADERBOARD
+        // 7. END GAME SCORECARD & GLOBAL LEADERBOARD
         // ====================================================================
         async function completeEscapeGame() {
             const netXP = Math.max(0, state.grossXP - state.penaltyXP);
@@ -1293,7 +1439,7 @@
         }
 
         // ====================================================================
-        // 7. ADMIN CONTROLS (BSV6-bgsw)
+        // 8. ADMIN CONTROLS (BSV6-bgsw)
         // ====================================================================
         function openAdminModal() {
             document.getElementById('admin-modal').classList.remove('hidden');
@@ -1311,10 +1457,10 @@
             if (pass === MASTER_PIN) {
                 document.getElementById('admin-auth-panel').classList.add('hidden');
                 document.getElementById('admin-view-panel').classList.remove('hidden');
-                
+
                 const records = await fetchGlobalStandings();
                 records.sort((a, b) => b.xp - a.xp);
-                
+
                 const target = document.getElementById('admin-records-target');
                 if (records.length === 0) {
                     target.innerHTML = '<span class="text-slate-500">No records found.</span>';
@@ -1337,7 +1483,8 @@
             }
 
             try {
-                await fetch(CLOUD_SYNC_ENDPOINT, {
+                const endpoint = getCloudEndpoint();
+                await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify([])
@@ -1351,7 +1498,7 @@
         }
 
         // ====================================================================
-        // 8. BACKGROUND PARTICLE EFFECTS
+        // 9. BACKGROUND PARTICLE EFFECTS
         // ====================================================================
         function initParticles() {
             const deck = document.getElementById('particle-deck');
@@ -1369,6 +1516,7 @@
 
         // Initialize on page load
         initParticles();
+        fetchGlobalStandings();
     </script>
 </body>
 </html>
